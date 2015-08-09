@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Bandit</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./vendor/font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./main.css">
+</head>
+<body>
+
+  <button id="bigone">
+
+
+    <div class="underlay">
+      <div id="run-time" class="blendin faded">00:00</div>
+    </div>
+    <div class="underlay">
+      <div id="pause"><i class="fa fa-pause blendin"></i></div>
+    </div>
+
+    <div id="run-control"></div>
+    <div id="lunch" class="invisible blendin">- <span id="lunch-deduction"></span> <i class="fa fa-cutlery"></i></div>
+
+  </button>
+
+
+</body>
+<script>
+  // Can't load jquery in script tag as you would normally - see https://github.com/atom/electron/issues/254
+  window.$ = window.jQuery = require('./vendor/jquery-1.11.3.min.js');
+</script>
+<script src="./vendor/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script src="./script/app-menu.js"></script>
+<script>
+var remote  = require('remote')
+var sprintf = require('sprintf').sprintf
+var ipc     = require('ipc')
+
+var interval
+var running = false
+var elapsed = 0
+
+$(function() {
+  var config = remote.getGlobal("config")
+
+  $('html').on('tick',update_progress)
+
+  // Start the refresh interval running
+  // Each tick of the interval fires a 'tick' event on the page
+  // that others can subscribe to.
+  interval = setInterval(function() {$("html").trigger('tick')}, config["refresh_interval_ms"])
+});
+
+update_progress = function() {
+  // Work out the percentage of the date done
+  var config = remote.getGlobal("config")
+  var done = (elapsed/HMToMs(config["day_length_HM"])) * 100
+  if (done > 100) { done = 100 }
+  console.log("Done "+done+"%")
+
+  // Progress bar is achieved using the css3 linear gradient
+  // Setting both colours to the same percentage causes a hard cut line
+  var color = 'rgba(0,100,0,0.7)';
+  if (running == false) {
+    color = 'rgba(100,100,100,0.7)'
+  }
+
+  $("#bigone").css('background','-webkit-linear-gradient(left,'+color+' '+done+'%,#ccc '+done+'%)');
+
+}
+
+
+</script>
+<script src="./script/control.js"></script>
+<script src="./script/persist.js"></script>
+<script src="./script/flexi.js"></script>
+<script src="./script/time-util.js"></script>
+<script src="./script/lunch.js"></script>
+</html>

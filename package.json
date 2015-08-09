@@ -1,0 +1,11 @@
+{
+  "name": "time-bandit",
+  "description": "Simple timesheet thingy",
+  "repository": "https://github.com/necrophonic/time-bandit",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "nedb": "^1.1.2",
+    "sprintf": "^0.1.5"
+  }
+}
