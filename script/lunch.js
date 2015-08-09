@@ -32,8 +32,8 @@ do_lunch = function() {
         var end   = times[i]
         var start = times[i-1]
 
-        // If end before lunch begins or start after it ends, ignore
         if (end <= lunch_start_ms || start >= lunch_end_ms) {
+          // If end before lunch begins or start after it ends, ignore
           continue
         }
 
@@ -78,6 +78,7 @@ do_lunch = function() {
 
 $(function() {
 
+  // Register subscriptions
   $("html").on('tick',do_lunch)
 
 })
