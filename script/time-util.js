@@ -17,7 +17,15 @@ function msToDuration(ms) {
   var hours = Math.floor(ms/HOUR)
   ms = ms%HOUR
   var minutes = Math.floor(ms/MINUTE)
-  return sprintf("%02s:%02s",hours,minutes)
+  var sign = ''
+
+  // Deal with minus durations
+  if (hours < 0) {
+    hours = (hours+1) * -1
+    minutes = minutes * -1
+    sign = '-'
+  }
+  return sprintf("%s%02s:%02s",sign,hours,minutes)
 }
 
 // Convert a duration back to milliseconds since midnight

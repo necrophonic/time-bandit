@@ -66,6 +66,7 @@ do_lunch = function() {
       update_doc["minus_lunch"] = adjust
       updateRecord(record['id'], update_doc, function() {
         if (adjust > 0) {
+          // Show the adjustment
           $("#lunch").toggleClass('invisible')
           $("#lunch-deduction").text(msToHM(adjust))
         }

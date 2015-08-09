@@ -14,6 +14,9 @@ update_flexi = function() {
 
     var local_elapsed = 0
 
+    // TODO have to deal with start/stop getting out of sync leading
+    //      to icky NaN
+
     var i = 0
     for (i=1; i<record["times"].length; i+=2) {
       local_elapsed += record["times"][i] - record["times"][i-1] // Stop - start
