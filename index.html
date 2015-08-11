@@ -56,7 +56,6 @@ update_progress = function() {
   var config = remote.getGlobal("config")
   var done = (elapsed/HMToMs(config["day_length_HM"])) * 100
   if (done > 100) { done = 100 }
-  console.log("Done "+done+"%")
 
   // Progress bar is achieved using the css3 linear gradient
   // Setting both colours to the same percentage causes a hard cut line
@@ -76,4 +75,5 @@ update_progress = function() {
 <script src="./script/flexi.js"></script>
 <script src="./script/time-util.js"></script>
 <script src="./script/lunch.js"></script>
+<script src="./script/record.js"></script>
 </html>

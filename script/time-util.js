@@ -12,6 +12,14 @@ function yyyymmddFromDate(date) {
   return sprintf("%4s%02s%02s",date.getYear()+1900,date.getMonth()+1,date.getDate())
 }
 
+function formatYYYMMDD(yyyymmdd) {
+  var m = yyyymmdd.match(/(\d\d\d\d)(\d\d)(\d\d)/)
+  var year = m[1]
+  var month = parseInt(m[2])
+  var day = parseInt(m[3])
+  return day+" / "+month+" / "+year
+}
+
 // Format a millisecond value into hh:mm (odd seconds thrown away)
 function msToDuration(ms) {
   var hours = Math.floor(ms/HOUR)
@@ -30,8 +38,11 @@ function msToDuration(ms) {
 
 // Convert a duration back to milliseconds since midnight
 function durationToMs(duration) {
-  var matches = duration.match(/(\d\d):(\d\d)/)
-  return parseInt(matches[0])*HOUR + parseInt(matches[1])*MINUTE
+  var matches = duration.match(/(\d?\d):(\d?\d)/)
+  if (!matches) {
+    console.error("Cannot parse duration '"+duration+"' to ms")
+  }
+  return parseInt(matches[1])*HOUR + parseInt(matches[2])*MINUTE
 }
 
 // Convert a Xh Ym string to milliseconds
@@ -39,13 +50,13 @@ function HMToMs(str) {
   var ms = 0
   var hour_match = str.match(/(\d+)h/)
   if (hour_match) {
-    ms += parseInt(hour_match[0]) * HOUR
+    ms += parseInt(hour_match[1]) * HOUR
   }
 
   var minutes = 0
   var minute_match = str.match(/(\d+)m/)
   if (minute_match) {
-    ms += parseInt(minute_match[0]) * MINUTE
+    ms += parseInt(minute_match[1]) * MINUTE
   }
   return ms
 }

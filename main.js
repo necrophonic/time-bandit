@@ -2,6 +2,12 @@ var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
 var ipc = require('ipc');
 
+var Datastore = require('nedb'), db = new Datastore({ filename: __dirname+'/db', autoload: true });
+
+var HOUR=3600000
+var MINUTE=60000
+var SECOND=1000
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
 var mainWindow = null;
@@ -12,9 +18,9 @@ var windows = [];
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform != 'darwin') {
+  // if (process.platform != 'darwin') {
     app.quit();
-  }
+  // }
 });
 
 // This method will be called when Electron has finished
@@ -42,7 +48,7 @@ app.on('ready', function() {
     //   v = null;
     // });
 
-    app.quit()
+    // app.quit()
   });
 
   var fs = require('fs')
@@ -59,6 +65,71 @@ app.on('ready', function() {
   }
 
 });
+
+ipc.on('close-times',function(event) {
+  windows['record'].close()
+})
+
+
+// TODO genericise window opening
+
+// ---- Record window ----
+ipc.on('open-record',function(event,yyyymmdd) {
+  console.log("Opening record window")
+  if (windows["record"]) {
+    windows["record"].show()
+    windows["record"].focus()
+  } else {
+    var date
+    if (yyyymmdd) {
+      date = '?date='+yyyymmdd
+    } else {
+      date = ''
+    }
+    windows["record"] = new BrowserWindow({width: 300, height: 400 });//, "resizable": false});
+    var url = 'file://' + __dirname + '/record.html'+date
+    console.log("Opening file: "+url)
+    windows["record"].loadUrl('file://' + __dirname + '/record.html'+date);
+    // windows["record"].openDevTools();
+    windows["record"].on('closed',function() {
+      windows["record"] = null
+    });
+  }
+});
+
+
+
+// Persistence
+ipc.on('get-record', function(event,date) {
+  db.find({'id':date},function(err,docs) {
+    if (!docs[0]) {
+      console.log("No record exists for date '"+date+"'")
+      var doc = {
+          "id"    : date,
+          "times" : [],
+          "done_lunch" : false
+      }
+      db.insert(doc,function(error) {
+        event.returnValue = doc
+      })
+    } else {
+      event.returnValue = docs[0]
+    }
+  })
+})
+
+ipc.on('update-record', function(event,date,update) {
+  console.log("Update record "+date)
+  db.update({'id':date},{$set: update},function() {
+    event.returnValue = true
+  })
+})
+
+
+
+
+
+
 
 // // ---- Settings window ----
 // ipc.on('save-settings',function(event,config) {
