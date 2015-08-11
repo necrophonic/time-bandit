@@ -12,6 +12,14 @@ function yyyymmddFromDate(date) {
   return sprintf("%4s%02s%02s",date.getYear()+1900,date.getMonth()+1,date.getDate())
 }
 
+function formatYYYMMDD(yyyymmdd) {
+  var m = yyyymmdd.match(/(\d\d\d\d)(\d\d)(\d\d)/)
+  var year = m[1]
+  var month = parseInt(m[2])
+  var day = parseInt(m[3])
+  return day+" / "+month+" / "+year
+}
+
 // Format a millisecond value into hh:mm (odd seconds thrown away)
 function msToDuration(ms) {
   var hours = Math.floor(ms/HOUR)

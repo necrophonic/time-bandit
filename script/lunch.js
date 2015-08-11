@@ -17,10 +17,7 @@ do_lunch = function() {
     var lunch_end_ms   = durationToMs(config["lunch_end"])
     var now = msSinceMidnight()
 
-    console.log(now+" -> "+lunch_end_ms)
-
     if (now > lunch_end_ms) {
-      console.log("Work out lunch")
       update_doc['done_lunch'] = true;
 
       var times = record['times']
@@ -58,9 +55,12 @@ do_lunch = function() {
         }
       }
 
-      var adjust = HMToMs(config["lunch_min_HM"])-lunch_duration_ms
-      if (adjust < 0) {
-        adjust = 0
+      // Work out how much of lunch WASN'T worked.
+      var lunch_span = lunch_end_ms - lunch_start_ms - lunch_duration_ms
+      var adjust = 0
+      if (lunch_span < HMToMs(config["lunch_min_HM"])) {
+        adjust = HMToMs(config["lunch_min_HM"]) - lunch_span
+        console.log("Adjusting for missed lunch: "+adjust)
       }
 
       update_doc["minus_lunch"] = adjust
