@@ -39,7 +39,7 @@ function msToDuration(ms) {
 // Convert a duration back to milliseconds since midnight
 function durationToMs(duration) {
   var matches = duration.match(/(\d\d):(\d\d)/)
-  return parseInt(matches[0])*HOUR + parseInt(matches[1])*MINUTE
+  return parseInt(matches[1])*HOUR + parseInt(matches[2])*MINUTE
 }
 
 // Convert a Xh Ym string to milliseconds
@@ -47,13 +47,13 @@ function HMToMs(str) {
   var ms = 0
   var hour_match = str.match(/(\d+)h/)
   if (hour_match) {
-    ms += parseInt(hour_match[0]) * HOUR
+    ms += parseInt(hour_match[1]) * HOUR
   }
 
   var minutes = 0
   var minute_match = str.match(/(\d+)m/)
   if (minute_match) {
-    ms += parseInt(minute_match[0]) * MINUTE
+    ms += parseInt(minute_match[1]) * MINUTE
   }
   return ms
 }
