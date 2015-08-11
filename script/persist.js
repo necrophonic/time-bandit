@@ -13,10 +13,10 @@ function getRecord(yyyymmdd, callback) {
   // Attempt to fetch the record for the date.
   db.find({'id':yyyymmdd},function(err,docs) {
     if (docs.length>0) {
-      console.log("Record loaded for "+yyyymmdd)
+      // console.log("Record loaded for "+yyyymmdd)
       callback(docs[0])
     } else {
-      console.log("Record for "+yyyymmdd+" doesn't exist yet - creating")
+      // console.log("Record for "+yyyymmdd+" doesn't exist yet - creating")
       var doc = {
         "id"    : yyyymmdd,
         "times" : [],
@@ -30,10 +30,10 @@ function getRecord(yyyymmdd, callback) {
 function saveRecord(record, callback) {
   db.update({'id':record['id']}, record, {upsert:true}, function(err) {
     if (err) {
-      console.error("Failed to save record for "+record['id']+": "+err)
+      // console.error("Failed to save record for "+record['id']+": "+err)
       callback({})
     }
-    console.log("Saved record for "+record['id'])
+    // console.log("Saved record for "+record['id'])
     callback(record)
   })
 }
@@ -41,10 +41,10 @@ function saveRecord(record, callback) {
 function updateRecord(id, update, callback) {
   db.update({'id':id},{ $set: update }, function(err) {
     if (err) {
-      console.error("Failed to update record for "+id+": "+err)
+      // console.error("Failed to update record for "+id+": "+err)
       callback()
     }
-    console.log("Updated record for "+id)
+    // console.log("Updated record for "+id)
     callback()
   })
 }
