@@ -1,13 +1,10 @@
 do_lunch = function() {
   var config = remote.getGlobal("config")
 
-  console.log("Check lunch @ "+msToHM(msSinceMidnight()))
-
   getRecord('',function(record) {
-    if (record['done_lunch']) {
-      console.log("Lunch already worked out")
-      return;
-    }
+    // if (record['done_lunch']) {
+    //   return;
+    // }
 
     update_doc = {}
 
@@ -21,7 +18,6 @@ do_lunch = function() {
       update_doc['done_lunch'] = true;
 
       var times = record['times']
-
       var lunch_duration_ms = 0
 
       var i=0
@@ -29,13 +25,18 @@ do_lunch = function() {
         var end   = times[i]
         var start = times[i-1]
 
+        // Work out how much of worked time falls between the lunch
+        // start and end times.
         if (end <= lunch_start_ms || start >= lunch_end_ms) {
           // If end before lunch begins or start after it ends, ignore
+          console.log("End before start or start after end")
           continue
         }
 
         if (start < lunch_start_ms && end > lunch_end_ms) {
           // Span whole lunch time - nothing will be deducted
+          console.log("Worked whole lunch")
+          lunch_duration_ms = lunch_end_ms-lunch_start_ms
           break
         }
 
@@ -55,8 +56,16 @@ do_lunch = function() {
         }
       }
 
+      // Deal with the current period (if one is running)
+      if (running) {
+        // TODO
+      }
+
       // Work out how much of lunch WASN'T worked.
       var lunch_span = lunch_end_ms - lunch_start_ms - lunch_duration_ms
+      console.log("Lunch span "+msToHM(lunch_span))
+      console.log("Worked in lunch "+msToHM(lunch_duration_ms))
+
       var adjust = 0
       if (lunch_span < HMToMs(config["lunch_min_HM"])) {
         adjust = HMToMs(config["lunch_min_HM"]) - lunch_span
@@ -67,8 +76,11 @@ do_lunch = function() {
       updateRecord(record['id'], update_doc, function() {
         if (adjust > 0) {
           // Show the adjustment
-          $("#lunch").toggleClass('invisible')
+          $("#lunch").removeClass('invisible')
           $("#lunch-deduction").text(msToHM(adjust))
+        }
+        else {
+          $("#lunch").addClass('invisible')
         }
         return
       })

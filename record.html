@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Bandit</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./vendor/font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./main.css">
+</head>
+<body>
+  <div class="container">
+    <h1 id="heading"></h1>
+    <form id="times-form">
+      <div id="times">
+
+      </div>
+      <input type="submit" id="submit-changes" disabled="disabled" class="btn btn-primary" value="save">
+      <a href="#" id="cancel">cancel</a>
+    </form>
+  </div>
+
+</body>
+<script>
+  // Can't load jquery in script tag as you would normally - see https://github.com/atom/electron/issues/254
+  window.$ = window.jQuery = require('./vendor/jquery-1.11.3.min.js');
+</script>
+<script src="./vendor/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script>
+var remote  = require('remote')
+var sprintf = require('sprintf').sprintf
+var ipc     = require('ipc')
+
+var date = ''
+
+$(function() {
+
+  date = getParam('date')
+  if (!date) {
+    date = yyyymmddFromDate(new Date())
+  }
+
+  $("#heading").text(formatYYYMMDD(date))
+
+  $("#times-form").on('submit', function(e) {
+    e.preventDefault();
+    save_times()
+    // ipc.send('save-times',$('form').serialize());
+  })
+
+  $("#cancel").click(function() {
+    ipc.send('close-times');
+  })
+
+  populate_times(date)
+});
+
+function add_row(times,row,index) {
+  $("#times").append(
+    '<div class="time-row">'+
+    '<div><input class="form-control input-time" name="time-'+row+'-1" type="text" id="time-'+row+'-1"></div>'+
+    '<div><input class="form-control input-time" name="time-'+row+'-2" type="text" id="time-'+row+'-2"></div>'+
+    '</div>'
+  );
+  $("#time-"+row+"-1").val(msToDuration(times[index-1]))
+  if (times[index]) {
+    $("#time-"+row+"-2").val(msToDuration(times[index]))
+  }
+  return
+}
+
+function populate_times(date) {
+  $("#times").html('')
+
+  getRecord(date, function(record) {
+    var times = record['times']
+    var i = 1
+    var row = 1
+    for (i=1; i<times.length; i+=2) {
+      add_row(times,row++,i)
+    }
+
+    // Add trailing row
+    if (times.length%2!=0) {
+      add_row(times,row,times.length)
+    }
+
+    // Enable the submit button when any changes have been made
+    $(".input-time").change(function() {
+      $("#submit-changes").removeAttr('disabled');
+    })
+  });
+}
+
+function save_times() {
+  var data = $("form").serialize()
+  if (!data) {
+    console.log("No times to save")
+    return
+  }
+
+  var pairs = data.split('&')
+  var new_times = []
+  for (var i=0;i<pairs.length;i++) {
+    var time = pairs[i].replace(/time-\d+-\d+=/,'').replace(/%3A/,":")
+    if (!time) {
+      continue
+    }
+    var ms = durationToMs(time)
+    if (ms) {
+      new_times.push(ms)
+    }
+  }
+
+  var update_record = { "times": new_times }
+
+  updateRecord(date, update_record, function() {
+    console.log("Saved new times!")
+    ipc.send('close-times')
+    return
+  })
+}
+
+</script>
+<script src="./script/time-util.js"></script>
+<script src="./script/url-util.js"></script>
+<script src="./script/persist.js"></script>
+</html>

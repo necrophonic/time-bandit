@@ -38,7 +38,10 @@ function msToDuration(ms) {
 
 // Convert a duration back to milliseconds since midnight
 function durationToMs(duration) {
-  var matches = duration.match(/(\d\d):(\d\d)/)
+  var matches = duration.match(/(\d?\d):(\d?\d)/)
+  if (!matches) {
+    console.error("Cannot parse duration '"+duration+"' to ms")
+  }
   return parseInt(matches[1])*HOUR + parseInt(matches[2])*MINUTE
 }
 

@@ -12,6 +12,7 @@ start_stop = function() {
     $("#run-time").toggleClass('faded');
     $("#pause").toggleClass('faded');
     var times = record['times']
+    console.log("Start/stop loaded times "+times)
     times.push(ms)
     updateRecord(record['id'],{"times":times},function() {
       return;

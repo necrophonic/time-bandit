@@ -82,12 +82,12 @@ var template = [
     ]
   },
   {
-    label: 'View',
+    label: 'Actions',
     submenu: [
       {
-        label: 'Reload',
+        label: 'Edit record',
         accelerator: 'Command+R',
-        click: function() { remote.getCurrentWindow().reload(); }
+        click: function(){ open_record()}
       },
     ]
   },

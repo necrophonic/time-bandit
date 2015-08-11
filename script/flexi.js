@@ -30,7 +30,7 @@ update_flexi = function() {
       local_elapsed -= record["minus_lunch"]
     }
 
-    console.log("Elapsed time (ms): "+local_elapsed)
+    // console.log("Elapsed time (ms): "+local_elapsed)
     $("#run-time").text(msToDuration(local_elapsed))
     elapsed = local_elapsed
 
