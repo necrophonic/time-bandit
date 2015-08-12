@@ -59,7 +59,7 @@ do_lunch = function() {
       // Deal with the current period (if one is running)
       // If it started before the end of lunch then account for the time
       // between that and the end of lunch period.
-      if (running)
+      if (running) {
         if (start < lunch_end_ms) {
           lunch_duration_ms += lunch_end_ms - start
         }
