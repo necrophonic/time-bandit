@@ -88,8 +88,8 @@ do_lunch = function() {
         }
         return
       })
-    }
-  })
+    })
+  
 }
 
 $(function() {

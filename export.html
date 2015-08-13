@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Bandit</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./vendor/font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./main.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Export</h1>
+    <form>
+
+      <button id="btn-export" type="button" class="btn btn-default">export</button>
+
+    </form>
+  </div>
+
+</body>
+<script>
+  // Can't load jquery in script tag as you would normally - see https://github.com/atom/electron/issues/254
+  window.$ = window.jQuery = require('./vendor/jquery-1.11.3.min.js');
+</script>
+<script src="./vendor/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script>
+var remote  = require('remote')
+var sprintf = require('sprintf').sprintf
+var ipc     = require('ipc')
+var fs      = require('fs')
+var dialog  = remote.require('dialog')
+
+var start_date
+var end_date
+
+var waitCount = 0
+var records   = {}
+var days
+
+$(function() {
+
+  // TODO default to current month until specific range is entered
+  // ...
+  var now = new Date()
+
+  // Set to start of month
+  start_date = new Date().setDate(1)
+  end_date = now
+
+  $("#btn-export").click(function() {
+    console.log("Export!")
+    console.log("Running export between "+start_date+" and "+end_date)
+
+    days = end_date.getDate() // Number of days to count through
+
+    // Clear down
+    waitCount = days
+    records   = {}
+    console.log("Wait count is set to "+waitCount)
+
+    for (var d=1;d<=days;d++) {
+      var date = sprintf("%s%02s%02s",now.getYear()+1900,now.getMonth()+1,d)
+      console.log("  Report for "+date)
+      fetchRecordForExport(date)
+    }
+  })
+
+  $("html").on('fetched-record',function() {
+    waitCount--
+    console.log("One wait completed - count is now "+waitCount)
+
+    if (waitCount==0) {
+      console.log("All days done!")
+
+      dialog.showSaveDialog({filters: [{name: 'CSV', extensions: ['csv']}]},function(filename) {
+        if (!filename) {
+          console.log("No file selected for save")
+          return
+        }
+        fd = fs.openSync(filename,'w')
+
+        // TODO Ensure sorting
+        for (var key in records) {
+          console.log("Got record for "+key)
+          var times_out = ''
+          for (var i=0; i<records[key]['times'].length; i++) {
+            times_out += ','+msToDuration(records[key]['times'][i])
+          }
+          fs.writeSync(fd,key+times_out+"\n")
+        }
+        fs.close(fd)
+      })
+    }
+  })
+
+})
+
+function fetchRecordForExport(date) {
+  // Read the record then decrement the wait count
+  getRecord(date,function(record) {
+    records[date] = record
+    $("html").trigger('fetched-record')
+  })
+}
+
+</script>
+<script src="./script/export.js"></script>
+<script src="./script/time-util.js"></script>
+<script src="./script/persist.js"></script>
+</html>

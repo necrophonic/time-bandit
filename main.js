@@ -86,7 +86,7 @@ ipc.on('open-record',function(event,yyyymmdd) {
     } else {
       date = ''
     }
-    windows["record"] = new BrowserWindow({width: 300, height: 400 });//, "resizable": false});
+    windows["record"] = new BrowserWindow({width: 300, height: 400, resizable: false});
     var url = 'file://' + __dirname + '/record.html'+date
     console.log("Opening file: "+url)
     windows["record"].loadUrl('file://' + __dirname + '/record.html'+date);
@@ -97,9 +97,24 @@ ipc.on('open-record',function(event,yyyymmdd) {
   }
 });
 
+// ---- Reporting window ----
+ipc.on('open-exporter',function(event) {
+  console.log("Opening report exporter")
+  if (windows["exporter"]) {
+    windows["exporter"].show()
+    windows["exporter"].focus()
+  } else {
+    windows["exporter"] = new BrowserWindow({width: 500, height: 550, resizable: false});
+    windows["exporter"].loadUrl('file://' + __dirname + '/export.html')
+    windows["exporter"].openDevTools()
+    windows["exporter"].on('closed',function() {
+      windows["exporter"] = null
+    });
+  }
+});
 
 
-// Persistence
+// ---- Persistence ----
 ipc.on('get-record', function(event,date) {
   db.find({'id':date},function(err,docs) {
     if (!docs[0]) {

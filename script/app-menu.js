@@ -89,6 +89,14 @@ var template = [
         accelerator: 'Command+R',
         click: function(){ open_record()}
       },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Export',
+        accelerator: 'Command+E',
+        click: function() { open_export()}
+      }
     ]
   },
   {
